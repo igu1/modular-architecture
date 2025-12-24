@@ -5,6 +5,7 @@ class Bike:
         self.db_conn = db_conn
         self.shared_context = shared_context
         print(f"Shared context for Bike: {self.shared_context}")
+        return self
 
     def get_bikes(self):
         # This is a placeholder - in a real implementation, this would query the bike database

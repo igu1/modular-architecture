@@ -69,11 +69,8 @@ class Car(BaseModule):
             return []
     
     def get_bikes(self):
-        loaded_modules = self.shared_context.get('loaded_modules')[0]
-        print(loaded_modules)
-        print(loaded_modules.get("bike"))
-        get_bikes_fn = loaded_modules.get('bike', {}).get('get_bikes')
-        print(f"Found get_bikes function: {get_bikes_fn}")
-        if get_bikes_fn:
-            return get_bikes_fn()
+        loaded_modules = self.shared_context.get('loaded_modules', {})
+        bike_module = loaded_modules.get('bike')
+        if bike_module and hasattr(bike_module, 'get_bikes'):
+            return bike_module.get_bikes()
         return None

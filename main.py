@@ -23,6 +23,8 @@ class ModularSystem:
                     raise NotImplementedError("Module does not support deinitialization")
                 module = initializer(self.db_conn, self.shared_context)
                 self.modules[module_name] = module
+                # Update shared context after each module loads
+                self.shared_context['loaded_modules'] = self.modules
                 print(f"Successfully loaded and initialized {module_name}")
             except Exception as e:
                 print(f"Error initializing module {module_name}: {e}")
@@ -35,9 +37,7 @@ class ModularSystem:
             return False
 
     def initcontext(self):
-        self.shared_context['loaded_modules'] = [
-            {name: dict(self.modules[name].__class__.__dict__)} for name in self.modules.keys()
-        ]
+        self.shared_context['loaded_modules'] = self.modules
         
 
     def initdb(self):
@@ -55,9 +55,9 @@ class ModularSystem:
 
 if __name__ == "__main__":
     system = ModularSystem()
+    system.initcontext()
     system.load_module("car")
     system.load_module("bike")
-    system.initcontext()
     system.list_modules()
     
     # Test bike count functionality
@@ -65,3 +65,7 @@ if __name__ == "__main__":
     car_module = system.get_module("car")
     getbikes = getattr(car_module, 'get_bikes')
     print(f"Get bikes: {getbikes()}")
+    
+    # Test direct access to bike module
+    bike_module = system.get_module("bike")
+    print(f"Direct bike access: {bike_module.get_bikes()}")
