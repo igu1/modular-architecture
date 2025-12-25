@@ -1,9 +1,11 @@
-from .car import Car
-from .bike import Bike
+from .product import Product
+from .cart import Cart
+from .checkout import Checkout
 
 modules = {
-    "car": Car,
-    "bike": Bike
+    "product": Product,
+    "cart": Cart,
+    "checkout": Checkout
 }
 
 __all__ = ["modules"]
