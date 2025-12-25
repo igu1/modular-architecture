@@ -7,9 +7,6 @@ class Base(BaseModule):
 
     def initialize(self, env):
         super().initialize(env)
-        
-        # session = self.get_db_session()
-        # other_module = self.get_other_module('auth')
 
     def load_routes(self):
         return super().load_routes()
