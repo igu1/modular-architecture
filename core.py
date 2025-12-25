@@ -1,14 +1,11 @@
 import re
-from database import init_db, get_session
 from registry import Registry
 from environment import Environment
 
 class ModularSystem:
     def __init__(self):
-        init_db("sqlite:///test.db")
         self.registry = Registry()
         self.env = Environment(self.registry)
-        self.registry.register_service('db_session', get_session)
         import modules
         self.registry.set_available_modules(modules.modules)
 
@@ -105,8 +102,7 @@ class ModularSystem:
 
 if __name__ == "__main__":
     system = ModularSystem()
-    system.load_module('base')
-    system.load_module('auth')
+    system.load_module('restaurant')
     system.load_manifest()
     system.list_modules()
     

@@ -17,6 +17,9 @@ class Environment:
     def get_service(self, name):
         return self._registry.get_service(name)
     
+    def register_service(self, name, service):
+        return self._registry.register_service(name, service)
+    
     def list_services(self):
         return self._registry.list_services()
     
@@ -24,7 +27,6 @@ class Environment:
         return self._registry.get_routes()
     
     def get_module_for_route(self, route_path):
-        """Get the module name that owns a specific route"""
         return self._registry.get_module_for_route(route_path)
     
     @property

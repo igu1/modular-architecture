@@ -1,5 +1,6 @@
 import json
 import os
+import importlib
 from urllib.parse import parse_qs
 
 class BaseModule:
@@ -15,19 +16,63 @@ class BaseModule:
     def initialize(self, env):
         self.env = env
         
-        db_session = self.env.get_service('db_session')
-        if not db_session:
+        # Load module services
+        self.load_services()
+        
+        db_service = self.env.get_service('db_service')
+        if not db_service:
             raise RuntimeError("Database service not found in environment")
         
         models = self.get_models()
         if models:  
+            db_session = db_service.get_session()
             for model in models:
                 model.metadata.create_all(db_session().bind)
                 print(f"Created tables for {model.__name__}")
     
+    def load_services(self):
+        """Automatically load services from the module's services directory"""
+        services_path = f"{self.__module__.replace('.', '/')}/services"
+        if not os.path.exists(services_path):
+            return
+        
+        service_files = [f for f in os.listdir(services_path) 
+                        if f.endswith('.py') and not f.startswith('__')]
+        
+        for service_file in service_files:
+            service_name = service_file[:-3]  # Remove .py extension
+            try:
+                # Import the service module
+                service_module_path = f"{self.__module__}.services.{service_name}"
+                service_module = importlib.import_module(service_module_path)
+                
+                # Look for service classes (typically ending with 'Service')
+                for attr_name in dir(service_module):
+                    attr = getattr(service_module, attr_name)
+                    if (isinstance(attr, type) and 
+                        attr_name.endswith('Service') and 
+                        hasattr(attr, '__init__')):
+                        
+                        # Instantiate and register the service
+                        service_instance = attr()
+                        module_name = self.__module__.split('.')[-1]
+                        
+                        # Base module services don't need prefix (foundational services)
+                        if module_name == 'base':
+                            service_key = service_name
+                        else:
+                            service_key = f"{module_name}_{service_name}"
+                            
+                        self.env.register_service(service_key, service_instance)
+                        print(f"Loaded service: {service_key}")
+                        break
+                        
+            except Exception as e:
+                print(f"Error loading service {service_name}: {e}")
+    
     def get_db_session(self):
-        db_session = self.env.get_service('db_session')
-        return db_session() if db_session else None
+        db_service = self.env.get_service('db_service')
+        return db_service.get_session() if db_service else None
     
     def get_other_module(self, name):
         return self.env.get_module(name)

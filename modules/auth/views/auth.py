@@ -1,11 +1,10 @@
 import json
-import hashlib
-import secrets
 from datetime import datetime, timedelta
 from modules.auth.models import User, Session
 
 def login(environ, start_response, auth_module): 
     try:
+        auth_service = auth_module.env.get_service('auth_auth_service')
         body = auth_module.get_body(environ)
         if not body:
             return auth_module.response(start_response, {'error': 'Invalid request'})
@@ -20,11 +19,11 @@ def login(environ, start_response, auth_module):
         if not user_dict or not user_dict.get('is_active'):
             return auth_module.response(start_response, {'error': 'Invalid credentials'})
         
-        password_hash = hash_password(password)
+        password_hash = auth_service.hash_password(password)
         if user_dict['password_hash'] != password_hash:
             return auth_module.response(start_response, {'error': 'Invalid credentials'})
         
-        session_token = generate_session_token()
+        session_token = auth_service.generate_session_token()
         expires_at = datetime.utcnow() + timedelta(hours=24)
         
         session_dict = Session.create(
@@ -141,7 +140,8 @@ def get_user(env, res, auth_module):
 
 def check_auth(environ, start_response, auth_module):
     try:
-        user_dict = get_current_user(environ)
+        auth_service = auth_module.env.get_service('auth_auth_service')
+        user_dict = auth_service.get_current_user(environ)
         if user_dict:
             return auth_module.response(start_response, {
                 'authenticated': True,
@@ -157,35 +157,3 @@ def check_auth(environ, start_response, auth_module):
         
     except Exception as e:
         return auth_module.response(start_response, {'error': str(e)})
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
-def generate_session_token():
-    return secrets.token_urlsafe(32)
-
-def get_session_token(environ):
-    auth_header = environ.get('HTTP_AUTHORIZATION', '')
-    if auth_header.startswith('Bearer '):
-        return auth_header[7:]
-    return environ.get('HTTP_X_SESSION_TOKEN')
-
-def get_current_user(environ):
-    session_token = get_session_token(environ)
-    if not session_token:
-        return None
-    
-    session_dict = Session.get(session_token=session_token)
-    if not session_dict:
-        return None
-    
-    # Check if session expired
-    expires_at = session_dict.get('expires_at')
-    if isinstance(expires_at, str):
-        expires_at = datetime.fromisoformat(expires_at)
-    
-    if expires_at and expires_at < datetime.utcnow():
-        Session.delete_record(session_dict['id'])
-        return None
-    
-    return User.get(id=session_dict['user_id'])
