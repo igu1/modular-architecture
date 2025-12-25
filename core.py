@@ -1,13 +1,9 @@
-from sqlalchemy import create_engine
+import re
 from database import init_db, get_session
 from registry import Registry
 from environment import Environment
 
 class ModularSystem:
-    """
-    Modular System - Coordinator only
-    All state is managed by the Registry (like Odoo)
-    """
     def __init__(self):
         init_db("sqlite:///test.db")
         self.registry = Registry()
@@ -38,7 +34,7 @@ class ModularSystem:
 
             try:
                 routes = module_class().load_routes()
-                self.registry.add_routes(routes)
+                self.registry.add_routes(routes, module_name)
             except AttributeError:
                 pass
 
@@ -72,18 +68,39 @@ class ModularSystem:
             module = self.env.get_module(name)
             manifest = module.get_info()
 
+    def _match_route(self, route, route_name):
+        import re
+        pattern = route_name
+        pattern = re.sub(r'<(\w+)>', r'(?P<\1>[^/]+)', pattern)
+        pattern = f'^{pattern}$'
+        match = re.match(pattern, route)
+        if match:
+            return True, match.groupdict()
+        return False, {}
+    
+    def _create_handler_with_module(self, handler, module_instance, route_params=None):
+        def wrapped_handler(environ, start_response):
+            environ['ROUTE_PARAMS'] = route_params or {}
+            return handler(environ, start_response, module_instance)
+        return wrapped_handler
+    
     def request_handler(self, environ, start_response):
         route = environ.get('PATH_INFO', '/')
-        routes = self.env.get_routes()
+        method = environ['REQUEST_METHOD']
         
-        for route_item in routes:
-            route_name, method, handler = route_item
-            if route.startswith(route_name) and environ['REQUEST_METHOD'] == method:
-                return handler(environ, start_response)
+        for route_name, route_method, handler in self.env.get_routes():
+            matches, params = self._match_route(route, route_name)
+            if matches and method == route_method:
+                module_name = self.env.get_module_for_route(route_name)
+                if module_name:
+                    module_instance = self.env.get_module(module_name)
+                    return self._create_handler_with_module(handler, module_instance, params)(environ, start_response)
+                return self._create_handler_with_module(handler, None, params)(environ, start_response)
         
-        status = '404 Not Found'
-        headers = [('Content-type', 'text/plain')]
-        start_response(status, headers)
+        return self._404_response(start_response)
+    
+    def _404_response(self, start_response):
+        start_response('404 Not Found', [('Content-type', 'text/plain')])
         return [b"Page not found"]
 
 if __name__ == "__main__":

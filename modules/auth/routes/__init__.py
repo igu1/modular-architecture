@@ -5,5 +5,6 @@ url = [
     ('/auth/logout', 'POST', logout),
     ('/auth/register', 'POST', register),
     ('/auth/profile', 'GET', profile),
-    ('/auth/check', 'GET', check_auth)
+    ('/auth/check', 'GET', check_auth),
+    ('/auth/<id>/users', 'GET', get_user)
 ]

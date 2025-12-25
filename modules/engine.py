@@ -58,7 +58,7 @@ class BaseModule:
                 routes.extend(url_list)
             elif isinstance(url_list, tuple):
                 routes.append(url_list)
-        
+
         return routes 
 
     def response(self, start_response, data):

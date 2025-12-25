@@ -4,8 +4,7 @@ import secrets
 from datetime import datetime, timedelta
 from modules.auth.models import User, Session
 
-def login(environ, start_response):
-    auth_module = get_auth_module()
+def login(environ, start_response, auth_module): 
     try:
         body = auth_module.get_body(environ)
         if not body:
@@ -49,8 +48,7 @@ def login(environ, start_response):
     except Exception as e:
         return auth_module.response(start_response, {'error': str(e)})
 
-def logout(environ, start_response):
-    auth_module = get_auth_module()
+def logout(environ, start_response, auth_module): 
     try:
         session_token = get_session_token(environ)
         if session_token:
@@ -63,8 +61,7 @@ def logout(environ, start_response):
     except Exception as e:
         return auth_module.response(start_response, {'error': str(e)})
 
-def register(environ, start_response):
-    auth_module = get_auth_module()
+def register(environ, start_response, auth_module): 
     try:
         body = auth_module.get_body(environ)
         if not body:
@@ -103,28 +100,46 @@ def register(environ, start_response):
     except Exception as e:
         return auth_module.response(start_response, {'error': str(e)})
 
-def profile(environ, start_response):
-    auth_module = get_auth_module()
+def profile(environ, start_response, auth_module): 
     try:
         user_dict = get_current_user(environ)
         if not user_dict:
             return auth_module.response(start_response, {'error': 'Not authenticated'})
         
-        return auth_module.response(start_response, {
-            'user': {
-                'id': user_dict['id'],
-                'username': user_dict['username'],
-                'email': user_dict['email'],
-                'created_at': user_dict.get('created_at'),
-                'last_login': user_dict.get('last_login')
-            }
-        })
+        # Handle datetime serialization
+        user_data = {
+            'id': user_dict['id'],
+            'username': user_dict['username'],
+            'email': user_dict['email']
+        }
+        
+        if user_dict.get('created_at'):
+            if hasattr(user_dict['created_at'], 'isoformat'):
+                user_data['created_at'] = user_dict['created_at'].isoformat()
+            else:
+                user_data['created_at'] = str(user_dict['created_at'])
+                
+        if user_dict.get('last_login'):
+            if hasattr(user_dict['last_login'], 'isoformat'):
+                user_data['last_login'] = user_dict['last_login'].isoformat()
+            else:
+                user_data['last_login'] = str(user_dict['last_login'])
+        
+        return auth_module.response(start_response, {'user': user_data})
         
     except Exception as e:
         return auth_module.response(start_response, {'error': str(e)})
 
-def check_auth(environ, start_response):
-    auth_module = get_auth_module()
+def get_user(env, res, auth_module):
+    route_params = env.get('ROUTE_PARAMS', {})
+    user_id = route_params.get('id')
+    if not user_id:
+        return auth_module.response(res, {'error': 'User ID is required'})
+    
+    users = User.get(id=user_id)
+    return auth_module.response(res, {'users': users})
+
+def check_auth(environ, start_response, auth_module):
     try:
         user_dict = get_current_user(environ)
         if user_dict:
@@ -142,12 +157,6 @@ def check_auth(environ, start_response):
         
     except Exception as e:
         return auth_module.response(start_response, {'error': str(e)})
-
-def get_auth_module():
-    import sys
-    sys.path.append('/home/ez/tmp/modular')
-    from modules.auth import Auth
-    return Auth()
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()

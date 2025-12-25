@@ -23,6 +23,10 @@ class Environment:
     def get_routes(self):
         return self._registry.get_routes()
     
+    def get_module_for_route(self, route_path):
+        """Get the module name that owns a specific route"""
+        return self._registry.get_module_for_route(route_path)
+    
     @property
     def registry(self):
         return self._registry

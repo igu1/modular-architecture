@@ -4,6 +4,7 @@ class Registry:
         self.services = {}
         self.available_modules = {}
         self.routes = []
+        self.route_to_module = {}  # Map routes to their modules
         
     
     def register_module(self, name, module):
@@ -33,17 +34,29 @@ class Registry:
     def list_services(self):
         return list(self.services.keys())
     
-    def add_routes(self, routes):
+    def add_routes(self, routes, module_name=None):
         if isinstance(routes, list):
             self.routes.extend(routes)
+            if module_name:
+                for route in routes:
+                    if isinstance(route, tuple) and len(route) >= 3:
+                        route_path = route[0]
+                        self.route_to_module[route_path] = module_name
         else:
             self.routes.append(routes)
+            if module_name and isinstance(routes, tuple) and len(routes) >= 3:
+                route_path = routes[0]
+                self.route_to_module[route_path] = module_name
     
     def get_routes(self):
         return self.routes
     
     def clear_routes(self):
         self.routes = []
+    
+    def get_module_for_route(self, route_path):
+        """Get the module name that owns a specific route"""
+        return self.route_to_module.get(route_path)
     
     def get_status(self):
         return {
