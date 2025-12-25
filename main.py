@@ -20,10 +20,14 @@ class ModularSystem:
             module = __import__(module_path, fromlist=[module_name])
             print(f"Initializing module: {module_name}")
             try:
-                module_deps = getattr(module, 'dependencies', [])
+                # Get the class to check dependencies
+                module_class = self.available_modules[module_name]
+                temp_instance = module_class()
+                module_deps = getattr(temp_instance, 'dependencies', [])
                 print(f"Module dependencies: {module_deps}")
                 
                 # Load dependencies first
+                #! TODO: The Module Init running twice in this way, its inefficient
                 for dep in module_deps:
                     if dep not in self.modules and dep in self.available_modules:
                         print(f"Loading dependency: {dep}")
@@ -32,7 +36,7 @@ class ModularSystem:
                         print(f"Dependency already loaded: {dep}")
                     else:
                         raise ValueError(f"Module '{dep}' is not available but listed as dependency")
-                        
+
                 initializer = getattr(module, 'initialize', None)
                 deinitializer = getattr(module, 'deinitialize', None)
                 if not initializer:
@@ -89,17 +93,14 @@ if __name__ == "__main__":
     system = ModularSystem()
     system.initcontext()
     system.load_module("product")
-    system.load_module("cart")
-    system.load_module("checkout")
     system.list_modules()
     
     # Test e-commerce functionality
     # print("Testing e-commerce functionality...")
-    # product_module = system.get_module("product")
-    # add_product = getattr(product_module, 'add_product')
-    # add_product("Laptop", 999.99, "Electronics")
-    # add_product("Book", 19.99, "Education")
-    
+    product_module = system.get_module("product")
+    list_products = getattr(product_module, 'list_products')
+    print("Products:", list_products())
+
     # # Test cart functionality
     # cart_module = system.get_module("cart")
     # add_to_cart = getattr(cart_module, 'add_to_cart')
@@ -110,8 +111,8 @@ if __name__ == "__main__":
     # view_cart = getattr(cart_module, 'view_cart')
     # print(f"Cart contents before checkout: {view_cart()}")
     
-    checkout_module = system.get_module("checkout")
-    checkout = getattr(checkout_module, 'checkout')
-    result = checkout("credit_card")
-    print(f"Checkout result: {result}")
+    # checkout_module = system.get_module("checkout")
+    # checkout = getattr(checkout_module, 'checkout')
+    # result = checkout("credit_card")
+    # print(f"Checkout result: {result}")
     
