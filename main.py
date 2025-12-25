@@ -1,5 +1,4 @@
-import sqlite3
-
+from sqlalchemy import create_engine
 
 class ModularSystem:
     def __init__(self):
@@ -29,7 +28,7 @@ class ModularSystem:
                 print(f"Module dependencies: {module_deps}")
                 
                 # Load dependencies first
-                #! TODO: The Module Init running twice in this way, its inefficient
+                #! TODO: The Module Init running twice in this way, its inefficient (1)
                 for dep in module_deps:
                     if dep not in self.modules and dep in self.available_modules:
                         print(f"Loading dependency: {dep}")
@@ -38,20 +37,16 @@ class ModularSystem:
                         print(f"Dependency already loaded: {dep}")
                     else:
                         raise ValueError(f"Module '{dep}' is not available but listed as dependency")
-
-                initializer = getattr(module, 'initialize', None)
-                deinitializer = getattr(module, 'deinitialize', None)
-                if not initializer:
-                    raise NotImplementedError("Module does not support initialization")
-                if not deinitializer:
-                    raise NotImplementedError("Module does not support deinitialization")
-                module = initializer(self.db_conn, self.shared_context)
-                load_routes_result = module.load_routes()
+                
+                #! Initialize module (2) (Continue to the whole project)
+                module_instance = module_class()
+                module_instance.initialize(self.db_conn, self.shared_context)
+                module = module_instance
                 try:
-                    self.routes.extend(module.routes)
+                    self.routes.extend(module.get_routes())
                     print(f"Added routes from module {module_name}")
                     print(f"Total routes loaded: {len(self.routes)}")
-                    for route in module.routes:
+                    for route in module.get_routes():
                         print(f"  - {route}")
                 except AttributeError:
                     print(f"Module {module_name} does not have a routes attribute, skipping route registration")
@@ -101,36 +96,41 @@ class ModularSystem:
         
 
     def initdb(self):
-        print("Initializing database...")
-        conn = sqlite3.connect('modular.db')
-        yield conn
+        engine = create_engine("sqlite:///test.db", echo=True)
+        yield engine
 
     def list_modules(self):
         for name, module in self.available_modules.items():
             status = "loaded" if name in self.modules else "not loaded"
-            print(f"  {name}: {module.__name__} ({status})")
+            print(f"  {name}: {module.__class__.__name__} ({status})")
 
     def get_module(self, module_name):
         return self.modules.get(module_name)
 
+    def load_manifest(self):
+        for name, module_class in self.modules.items():
+            manifest = module_class.get_info()
+            if 'manifests' not in self.shared_context:
+                self.shared_context['manifests'] = {}
+            self.shared_context['manifests'][name] = manifest
+
 if __name__ == "__main__":
     system = ModularSystem()
     system.initcontext()
-    system.load_module("cart")
+    system.load_module('base')
+    system.load_manifest()
     system.list_modules()
     
-    # Start the web server
+    print(system.shared_context)
+
     from wsgiref.simple_server import make_server
 
-    print("API server would start on http://localhost:8080")
-    print("Press Ctrl+C to stop")
     try:
         def wsgi_app(environ, start_response):
             return system.request_handler(environ, start_response)
         
         httpd = make_server('localhost', 8080, wsgi_app)
         print("Server running... Press Ctrl+C to stop")
-        print("Server started successfully!")
         print("Visit http://localhost:8080 to see the server")
         print("Press Ctrl+C to stop the server")
         print("Use 'fuser -k 8080/tcp' to kill any existing processes")

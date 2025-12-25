@@ -1,11 +1,7 @@
-from .product import Product
-from .cart import Cart
-from .checkout import Checkout
+from .base import Base
 
 modules = {
-    "product": Product,
-    "cart": Cart,
-    "checkout": Checkout
+    'base': Base
 }
 
 __all__ = ["modules"]
