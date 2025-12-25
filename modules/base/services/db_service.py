@@ -1,4 +1,5 @@
 from database import init_db, get_session
+from logger import core_logger
 
 class DatabaseService:
     def __init__(self):
@@ -6,7 +7,7 @@ class DatabaseService:
         try:
             init_db("sqlite:///test.db")
         except Exception as e:
-            print(f"Database already initialized or error: {e}")
+            core_logger.log("db_service", f"Database already initialized or error: {e}", "warning")
     
     def get_session(self):
         """Get database session function"""

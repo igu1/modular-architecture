@@ -7,6 +7,10 @@ class Base(BaseModule):
 
     def initialize(self, env):
         super().initialize(env)
+        self.setup_event_handlers()
+
+    def setup_event_handlers(self):
+        pass
 
     def load_routes(self):
         return super().load_routes()

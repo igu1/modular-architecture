@@ -33,6 +33,10 @@ class Environment:
     def registry(self):
         return self._registry
     
+    @property
+    def logger(self):
+        return self._registry.logger
+    
     def __getitem__(self, key):
         return self.get_module(key)
     

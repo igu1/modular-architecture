@@ -5,6 +5,7 @@ from datetime import datetime
 import hashlib
 import secrets
 from typing import Dict, Any, Optional, Union, List, Tuple
+from logger import core_logger
 
 
 class WSGIHelpers:
@@ -63,8 +64,8 @@ class WSGIHelpers:
                 body = json.loads(body_text)
                 return body
             except json.JSONDecodeError as e:
-                print(f"JSON decode error: {e}")
-                print(f"Body text: '{body_text}'")
+                core_logger.log("helper", f"JSON decode error: {e}", "error")
+                core_logger.log("helper", f"Body text: '{body_text}'", "error")
                 return None
         return {}
     
@@ -289,22 +290,21 @@ class LoggingHelpers:
         user_agent = environ.get('HTTP_USER_AGENT', 'Unknown')
         ip = environ.get('REMOTE_ADDR', 'Unknown')
         
-        log_entry = f"[{timestamp}] {ip} - {method} {path} - {user_agent}"
+        log_entry = f"{ip} - {method} {path} - {user_agent}"
         if response_status:
             log_entry += f" - {response_status}"
         
-        print(log_entry)
+        core_logger.log("http", log_entry, "info")
     
     @staticmethod
     def log_error(message: str, exception: Exception = None):
         """Log error with optional exception details"""
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        error_msg = f"[{timestamp}] ERROR: {message}"
+        error_msg = message
         
         if exception:
             error_msg += f" - {type(exception).__name__}: {str(exception)}"
         
-        print(error_msg)
+        core_logger.log("helper", error_msg, "error")
 
 
 # Global instances for easy access

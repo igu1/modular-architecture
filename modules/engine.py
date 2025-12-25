@@ -28,7 +28,7 @@ class BaseModule:
             db_session = db_service.get_session()
             for model in models:
                 model.metadata.create_all(db_session().bind)
-                print(f"Created tables for {model.__name__}")
+                self.log(f"Created tables for {model.__name__}", "info")
     
     def load_services(self):
         """Automatically load services from the module's services directory"""
@@ -64,11 +64,11 @@ class BaseModule:
                             service_key = f"{module_name}_{service_name}"
                             
                         self.env.register_service(service_key, service_instance)
-                        print(f"Loaded service: {service_key}")
+                        self.log(f"Loaded service: {service_key}", "info")
                         break
                         
             except Exception as e:
-                print(f"Error loading service {service_name}: {e}")
+                self.log(f"Error loading service {service_name}: {e}", "error")
     
     def get_db_session(self):
         db_service = self.env.get_service('db_service')
@@ -126,8 +126,8 @@ class BaseModule:
                 body = json.loads(body_text)
                 return body
             except json.JSONDecodeError as e:
-                print(f"JSON decode error: {e}")
-                print(f"Body text: '{body_text}'")
+                self.log(f"JSON decode error: {e}", "error")
+                self.log(f"Body text: '{body_text}'", "error")
                 return None
         return {}
     
@@ -140,3 +140,35 @@ class BaseModule:
     
     def get_manifest(self):
         return self.get_info()
+    
+    # PubSub System Methods for Modules
+    def subscribe_to_event(self, event_name, callback_func):
+        """Subscribe to an event with a callback function"""
+        module_name = self.__module__.split('.')[-1]
+        self.env.registry.subscribe(event_name, module_name, callback_func)
+    
+    def unsubscribe_from_event(self, event_name, callback_func=None):
+        """Unsubscribe from an event"""
+        module_name = self.__module__.split('.')[-1]
+        self.env.registry.unsubscribe(event_name, module_name, callback_func)
+    
+    def emit_event(self, event_name, data=None):
+        """Emit an event to all subscribers"""
+        module_name = self.__module__.split('.')[-1]
+        self.env.registry.emit(event_name, data, module_name)
+    
+    def on_event(self, event_name):
+        """Decorator to easily subscribe to events"""
+        def decorator(callback_func):
+            self.subscribe_to_event(event_name, callback_func)
+            return callback_func
+        return decorator
+    
+    def log(self, message, level='info'):
+        module_name = self.__module__.split('.')[-1]
+        if hasattr(self, 'env') and hasattr(self.env, 'logger'):
+            self.env.logger.log(module_name, message, level)
+        else:
+            # Use base logger as fallback
+            from logger import core_logger
+            core_logger.log(module_name, message, level)
