@@ -1,0 +1,17 @@
+from modules.engine import BaseModule
+
+class Auth(BaseModule):
+    dependencies = ['base']
+    
+    def __init__(self):
+        super().__init__()
+
+    def initialize(self, env):
+        super().initialize(env)
+        self.base_module = env.get_module('base')
+
+    def load_routes(self):
+        return super().load_routes()
+
+    def deinitialize(self):
+        pass

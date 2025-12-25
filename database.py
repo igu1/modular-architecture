@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from typing import Optional, List, Dict, Any
+from contextlib import contextmanager
 
 _engine = None
 _SessionLocal = None
@@ -19,62 +20,76 @@ def get_session():
         raise RuntimeError("Database not initialized. Call init_db() first.")
     return _SessionLocal()
 
+
+# Manassilakkanund
+@contextmanager
+def session_scope():
+    session = get_session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
 class DatabaseModel(Base):
-    """Base model class with Django-like methods"""
     __abstract__ = True
     
     @classmethod
     def create(cls, **kwargs):
-        """Create new record"""
-        with get_session() as session:
+        with session_scope() as session:
             instance = cls(**kwargs)
             session.add(instance)
-            session.commit()
+            session.flush()
             session.refresh(instance)
-            return instance
+            return instance.to_dict()
     
     @classmethod
     def get(cls, **kwargs):
-        """Get first matching record"""
-        with get_session() as session:
-            return session.query(cls).filter_by(**kwargs).first()
+        with session_scope() as session:
+            instance = session.query(cls).filter_by(**kwargs).first()
+            return instance.to_dict() if instance else None
     
     @classmethod
     def filter(cls, **kwargs):
-        """Get all matching records"""
-        with get_session() as session:
-            return session.query(cls).filter_by(**kwargs).all()
+        with session_scope() as session:
+            instances = session.query(cls).filter_by(**kwargs).all()
+            return [inst.to_dict() for inst in instances]
     
     @classmethod
     def all(cls):
-        """Get all records"""
-        with get_session() as session:
-            return session.query(cls).all()
+        with session_scope() as session:
+            instances = session.query(cls).all()
+            return [inst.to_dict() for inst in instances]
     
     @classmethod
     def count(cls):
-        """Count all records"""
-        with get_session() as session:
+        with session_scope() as session:
             return session.query(cls).count()
     
-    def update(self, **kwargs):
-        """Update record"""
-        with get_session() as session:
-            for key, value in kwargs.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
-            session.merge(self)
-            session.commit()
-            session.refresh(self)
-            return self
+    @classmethod
+    def update_record(cls, record_id, **kwargs):
+        with session_scope() as session:
+            instance = session.query(cls).filter_by(id=record_id).first()
+            if instance:
+                for key, value in kwargs.items():
+                    if hasattr(instance, key):
+                        setattr(instance, key, value)
+                session.flush()
+                session.refresh(instance)
+                return instance.to_dict()
+            return None
     
-    def delete(self):
-        """Delete record"""
-        with get_session() as session:
-            session.delete(self)
-            session.commit()
-            return True
+    @classmethod
+    def delete_record(cls, record_id):
+        with session_scope() as session:
+            instance = session.query(cls).filter_by(id=record_id).first()
+            if instance:
+                session.delete(instance)
+                return True
+            return False
     
     def to_dict(self):
-        """Convert to dictionary"""
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

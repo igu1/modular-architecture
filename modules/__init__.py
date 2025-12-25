@@ -1,7 +1,9 @@
 from .base import Base
+from .auth import Auth
 
 modules = {
-    'base': Base
+    'base': Base,
+    'auth': Auth
 }
 
 __all__ = ["modules"]

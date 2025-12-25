@@ -89,6 +89,7 @@ class ModularSystem:
 if __name__ == "__main__":
     system = ModularSystem()
     system.load_module('base')
+    system.load_module('auth')
     system.load_manifest()
     system.list_modules()
     
