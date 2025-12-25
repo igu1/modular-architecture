@@ -12,15 +12,25 @@ class BaseModule:
         with open(manifest_path, "r") as f:
             return json.load(f)
 
-    def initialize(self, db_conn, shared_context):
-        self.db_conn = db_conn
-        self.shared_context = shared_context
-
+    def initialize(self, env):
+        self.env = env
+        
+        db_session = self.env.get_service('db_session')
+        if not db_session:
+            raise RuntimeError("Database service not found in environment")
+        
         models = self.get_models()
         if models:  
             for model in models:
-                model.metadata.create_all(self.db_conn)
+                model.metadata.create_all(db_session().bind)
                 print(f"Created tables for {model.__name__}")
+    
+    def get_db_session(self):
+        db_session = self.env.get_service('db_session')
+        return db_session() if db_session else None
+    
+    def get_other_module(self, name):
+        return self.env.get_module(name)
         
     def get_models(self):
         models_path = f"{self.__module__}.models"
