@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class ModularSystem:
     def __init__(self):
         import modules
@@ -12,6 +13,7 @@ class ModularSystem:
             "on": self.on,
             "emit": self.emit
         }
+        self.routes = []
 
         
     def load_module(self, module_name):
@@ -44,6 +46,16 @@ class ModularSystem:
                 if not deinitializer:
                     raise NotImplementedError("Module does not support deinitialization")
                 module = initializer(self.db_conn, self.shared_context)
+                load_routes_result = module.load_routes()
+                try:
+                    self.routes.extend(module.routes)
+                    print(f"Added routes from module {module_name}")
+                    print(f"Total routes loaded: {len(self.routes)}")
+                    for route in module.routes:
+                        print(f"  - {route}")
+                except AttributeError:
+                    print(f"Module {module_name} does not have a routes attribute, skipping route registration")
+                    pass
                 self.modules[module_name] = module
                 self.shared_context['loaded_modules'] = self.modules
                 print(f"Successfully loaded and initialized {module_name}")
@@ -72,6 +84,18 @@ class ModularSystem:
             except Exception as e:
                 print(f"Event handler error for {event_name}: {e}")
 
+    def request_handler(self, environ, start_response):
+        route = environ.get('PATH_INFO', '/')
+        for route_item in self.routes:
+            route_name, handler, method = route_item
+            if route.startswith(route_name) and environ['REQUEST_METHOD'] == method:
+                return handler(environ, start_response)
+        
+        status = '404 Not Found'
+        headers = [('Content-type', 'text/plain')]
+        start_response(status, headers)
+        return [b"Page not found"]
+
     def initcontext(self):
         self.shared_context['loaded_modules'] = self.modules
         
@@ -92,27 +116,25 @@ class ModularSystem:
 if __name__ == "__main__":
     system = ModularSystem()
     system.initcontext()
-    system.load_module("product")
+    system.load_module("cart")
     system.list_modules()
     
-    # Test e-commerce functionality
-    # print("Testing e-commerce functionality...")
-    product_module = system.get_module("product")
-    list_products = getattr(product_module, 'list_products')
-    print("Products:", list_products())
+    # Start the web server
+    from wsgiref.simple_server import make_server
 
-    # # Test cart functionality
-    # cart_module = system.get_module("cart")
-    # add_to_cart = getattr(cart_module, 'add_to_cart')
-    # add_to_cart(1, 2)  # Add 2 laptops to cart
-    # add_to_cart(2, 1)  # Add 1 book to cart
-    
-    # # View cart before checkout
-    # view_cart = getattr(cart_module, 'view_cart')
-    # print(f"Cart contents before checkout: {view_cart()}")
-    
-    # checkout_module = system.get_module("checkout")
-    # checkout = getattr(checkout_module, 'checkout')
-    # result = checkout("credit_card")
-    # print(f"Checkout result: {result}")
-    
+    print("API server would start on http://localhost:8080")
+    print("Press Ctrl+C to stop")
+    try:
+        def wsgi_app(environ, start_response):
+            return system.request_handler(environ, start_response)
+        
+        httpd = make_server('localhost', 8080, wsgi_app)
+        print("Server running... Press Ctrl+C to stop")
+        print("Server started successfully!")
+        print("Visit http://localhost:8080 to see the server")
+        print("Press Ctrl+C to stop the server")
+        print("Use 'fuser -k 8080/tcp' to kill any existing processes")
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServer stopped.")
+
