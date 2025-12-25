@@ -180,5 +180,4 @@ ehthumbs.db
 Thumbs.db
 
 # Module exclusions - only track base module
-modules/auth/
 modules/restaurant/
