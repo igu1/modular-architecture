@@ -49,7 +49,8 @@ def login(environ, start_response, auth_module):
 
 def logout(environ, start_response, auth_module): 
     try:
-        session_token = get_session_token(environ)
+        auth_service = auth_module.env.get_service('auth_auth_service')
+        session_token = auth_service.get_session_token(environ)
         if session_token:
             session_dict = Session.get(session_token=session_token)
             if session_dict:
@@ -62,6 +63,7 @@ def logout(environ, start_response, auth_module):
 
 def register(environ, start_response, auth_module): 
     try:
+        auth_service = auth_module.env.get_service('auth_auth_service')
         body = auth_module.get_body(environ)
         if not body:
             return auth_module.response(start_response, {'error': 'Invalid request'})
@@ -79,7 +81,7 @@ def register(environ, start_response, auth_module):
         if User.get(email=email):
             return auth_module.response(start_response, {'error': 'Email already exists'})
         
-        password_hash = hash_password(password)
+        password_hash = auth_service.hash_password(password)
         
         user_dict = User.create(
             username=username,

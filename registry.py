@@ -2,9 +2,9 @@ class Registry:
     def __init__(self):
         self.modules = {}
         self.services = {}
-        self.available_modules = {}
         self.routes = []
-        self.route_to_module = {}  # Map routes to their modules
+        self.route_to_module = {}
+        self.available_modules = {}
         
     
     def register_module(self, name, module):
