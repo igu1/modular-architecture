@@ -1,11 +1,11 @@
 from sqlalchemy import create_engine
+from database import init_db
 
 class ModularSystem:
     def __init__(self):
         import modules
         self.available_modules = modules.modules
         self.modules = {}
-        self.db_conn = next(self.initdb())
         self.shared_context = {}
         self.shared_context["events"] = {}
         self.shared_context['event_dispatcher'] = {
@@ -21,7 +21,6 @@ class ModularSystem:
             module = __import__(module_path, fromlist=[module_name])
             print(f"Initializing module: {module_name}")
             try:
-                # Get the class to check dependencies
                 module_class = self.available_modules[module_name]
                 temp_instance = module_class()
                 module_deps = getattr(temp_instance, 'dependencies', [])
@@ -37,21 +36,17 @@ class ModularSystem:
                         print(f"Dependency already loaded: {dep}")
                     else:
                         raise ValueError(f"Module '{dep}' is not available but listed as dependency")
-                
+
+                try:
+                    routes = module_class().load_routes()
+                    self.routes.extend(routes)
+                except AttributeError:
+                    pass
+
                 #! Initialize module (2) (Continue to the whole project)
                 module_instance = module_class()
                 module_instance.initialize(self.db_conn, self.shared_context)
-                module = module_instance
-                try:
-                    self.routes.extend(module.get_routes())
-                    print(f"Added routes from module {module_name}")
-                    print(f"Total routes loaded: {len(self.routes)}")
-                    for route in module.get_routes():
-                        print(f"  - {route}")
-                except AttributeError:
-                    print(f"Module {module_name} does not have a routes attribute, skipping route registration")
-                    pass
-                self.modules[module_name] = module
+                self.modules[module_name] = module_instance
                 self.shared_context['loaded_modules'] = self.modules
                 print(f"Successfully loaded and initialized {module_name}")
             except Exception as e:
@@ -82,7 +77,7 @@ class ModularSystem:
     def request_handler(self, environ, start_response):
         route = environ.get('PATH_INFO', '/')
         for route_item in self.routes:
-            route_name, handler, method = route_item
+            route_name, method, handler = route_item
             if route.startswith(route_name) and environ['REQUEST_METHOD'] == method:
                 return handler(environ, start_response)
         
@@ -96,8 +91,7 @@ class ModularSystem:
         
 
     def initdb(self):
-        engine = create_engine("sqlite:///test.db", echo=True)
-        yield engine
+        init_db("sqlite:///test.db")
 
     def list_modules(self):
         for name, module in self.available_modules.items():
@@ -120,8 +114,7 @@ if __name__ == "__main__":
     system.load_module('base')
     system.load_manifest()
     system.list_modules()
-    
-    print(system.shared_context)
+    print(system.routes)
 
     from wsgiref.simple_server import make_server
 

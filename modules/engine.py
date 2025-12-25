@@ -4,7 +4,7 @@ from urllib.parse import parse_qs
 
 class BaseModule:
     def __init__(self):
-        self.routes = self.load_routes()
+        self.routes = []
     
     def get_info(self):
         module_path = self.__module__.replace(".", "/")
@@ -21,7 +21,7 @@ class BaseModule:
             for model in models:
                 model.metadata.create_all(self.db_conn)
                 print(f"Created tables for {model.__name__}")
-
+        
     def get_models(self):
         models_path = f"{self.__module__}.models"
         models_module = __import__(models_path, fromlist=["models"])
@@ -38,10 +38,18 @@ class BaseModule:
         pass
 
     def load_routes(self):
-        return []
-    
-    def get_routes(self):
-        return self.routes
+        routes_path = f"{self.__module__}.routes"
+        routes_module = __import__(routes_path, fromlist=["routes"])
+        
+        routes = []
+        if hasattr(routes_module, 'url'):
+            url_list = getattr(routes_module, 'url')
+            if isinstance(url_list, list):
+                routes.extend(url_list)
+            elif isinstance(url_list, tuple):
+                routes.append(url_list)
+        
+        return routes 
 
     def response(self, start_response, data):
         response_data = json.dumps(data).encode('utf-8')

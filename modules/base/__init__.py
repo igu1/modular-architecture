@@ -6,7 +6,10 @@ class Base(BaseModule):
         super().__init__()
 
     def initialize(self, db_conn, shared_context):
-        return super().initialize(db_conn, shared_context)
+        super().initialize(db_conn, shared_context)
+
+    def load_routes(self):
+        return super().load_routes()
 
     def deinitialize(self):
         pass
