@@ -74,3 +74,10 @@ class Car(BaseModule):
         if bike_module and hasattr(bike_module, 'get_bikes'):
             return bike_module.get_bikes()
         return None
+
+    def create_bike(self, make, model):
+        event_dispatcher = self.shared_context.get('event_dispatcher')
+        emit = event_dispatcher['emit']
+        emit('bike_create', {'make': make, 'model': model})
+        emit('bike_list', {'source': 'car_module', 'triggered_by': 'create_bike'})
+        

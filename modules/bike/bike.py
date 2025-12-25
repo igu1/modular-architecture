@@ -4,7 +4,8 @@ class Bike:
         print("Initializing Generic Bike...")
         self.db_conn = db_conn
         self.shared_context = shared_context
-        print(f"Shared context for Bike: {self.shared_context}")
+        self.shared_context['event_dispatcher']['on']('bike_create', self.on_bike_create)
+        self.shared_context['event_dispatcher']['on']('bike_list', self.on_bike_list)
         return self
 
     def get_bikes(self):
@@ -20,3 +21,12 @@ class Bike:
                 print(f"Error closing database connection for Bike: {e}")
             finally:
                 self.db_conn = None
+    
+    def on_bike_create(self, payload, context):
+        print(f"Bike module received create event: {payload}")
+
+    def on_bike_list(self, payload, context):
+        print(f"Bike module received list event: {payload}")
+        bikes = self.get_bikes()
+        print(f"Bike list: {bikes}")
+        return bikes
