@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Float, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from database import Base
+from database import DatabaseModel, Base
 
-class Account(Base):
+class Account(DatabaseModel):
     __tablename__ = 'accounts'
     
     id = Column(Integer, primary_key=True)

@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from database import Base
+from database import DatabaseModel, Base
 
-class Contact(Base):
+class Contact(DatabaseModel):
     __tablename__ = 'contacts'
     
     id = Column(Integer, primary_key=True)
