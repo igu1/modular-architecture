@@ -97,7 +97,13 @@ class BaseModule:
         routes_module = __import__(routes_path, fromlist=["routes"])
         
         routes = []
-        if hasattr(routes_module, 'url'):
+        if hasattr(routes_module, 'routes'):
+            route_list = getattr(routes_module, 'routes')
+            if isinstance(route_list, list):
+                routes.extend(route_list)
+            elif isinstance(route_list, tuple):
+                routes.append(route_list)
+        elif hasattr(routes_module, 'url'):
             url_list = getattr(routes_module, 'url')
             if isinstance(url_list, list):
                 routes.extend(url_list)
@@ -106,9 +112,9 @@ class BaseModule:
 
         return routes 
 
-    def response(self, start_response, data):
+    def response(self, start_response, data, status='200 OK'):
         response_data = json.dumps(data).encode('utf-8')
-        start_response('200 OK', [('Content-Type', 'application/json'), ('Content-Length', str(len(response_data)))])
+        start_response(status, [('Content-Type', 'application/json'), ('Content-Length', str(len(response_data)))])
         return [response_data]
 
     def get_body(self, environ):

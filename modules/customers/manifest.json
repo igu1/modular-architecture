@@ -1,0 +1,7 @@
+{
+    "name": "customers",
+    "version": "1.0.0",
+    "description": "Customer management module - works standalone or integrates with CRM and Leads",
+    "author": "System",
+    "dependencies": ["base", "auth"]
+}

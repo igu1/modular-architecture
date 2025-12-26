@@ -1,0 +1,7 @@
+{
+    "name": "crm",
+    "version": "1.0.0",
+    "description": "Base CRM module with common services and utilities",
+    "author": "System",
+    "dependencies": ["base", "auth"]
+}

@@ -95,7 +95,9 @@ class DatabaseModel(Base):
         result = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
-            if hasattr(value, 'isoformat'):  # Handle datetime objects
+            if hasattr(value, 'isoformat'):
                 value = value.isoformat()
+            elif hasattr(value, 'value'):
+                value = value.value
             result[c.name] = value
         return result

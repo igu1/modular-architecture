@@ -41,7 +41,15 @@ class ModularSystem:
     def _create_handler_with_module(self, handler, module_instance, route_params=None):
         def wrapped_handler(environ, start_response):
             environ['ROUTE_PARAMS'] = route_params or {}
-            return handler(environ, start_response, module_instance)
+            
+            # If handler is a string path, import it
+            if isinstance(handler, str):
+                module_path, func_name = handler.rsplit('.', 1)
+                handler_module = __import__(module_path, fromlist=[func_name])
+                handler_func = getattr(handler_module, func_name)
+                return handler_func(environ, start_response, module_instance)
+            else:
+                return handler(environ, start_response, module_instance)
         return wrapped_handler
     
     def request_handler(self, environ, start_response):
@@ -65,7 +73,10 @@ class ModularSystem:
 
 if __name__ == "__main__":
     system = ModularSystem()
-    system.load_module('auth')
+    system.load_module('crm')
+    system.load_module('leads')
+    system.load_module('customers')
+    system.load_module('newsletter')
     system.load_manifest()
 
     from wsgiref.simple_server import make_server
