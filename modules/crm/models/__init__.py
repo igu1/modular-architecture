@@ -1,8 +1,8 @@
-from database import DatabaseModel, Base
+from database import Base
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
 from datetime import datetime
 
-class Company(DatabaseModel):
+class Company(Base):
     __tablename__ = 'crm_companies'
     
     id = Column(Integer, primary_key=True)

@@ -1,0 +1,13 @@
+{
+    "name": "quotes",
+    "version": "1.0.0",
+    "description": "Quote management module - create and manage sales quotes",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth", "opportunities", "accounts", "contacts", "products"],
+    "optional_dependencies": [],
+    "config": {
+        "module_type": "crm_sales",
+        "load_order": 20,
+        "auto_load": false
+    }
+}

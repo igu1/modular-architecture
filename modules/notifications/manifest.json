@@ -1,0 +1,13 @@
+{
+    "name": "notifications",
+    "version": "1.0.0",
+    "description": "Notification system module - send alerts and notifications to users",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth"],
+    "optional_dependencies": [],
+    "config": {
+        "module_type": "crm_automation",
+        "load_order": 30,
+        "auto_load": false
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "name": "contacts",
+    "version": "1.0.0",
+    "description": "Contact management module - manage individual contacts and their relationships",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth", "accounts"],
+    "optional_dependencies": ["customers"],
+    "config": {
+        "module_type": "crm_core",
+        "load_order": 10,
+        "auto_load": false
+    }
+}

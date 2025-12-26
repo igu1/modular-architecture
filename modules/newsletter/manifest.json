@@ -3,5 +3,5 @@
     "version": "1.0.0",
     "description": "Newsletter management module - works standalone or integrates with CRM and Customers",
     "author": "System",
-    "dependencies": ["base", "auth"]
+    "dependencies": ["base", "auth", "crm"]
 }

@@ -1,0 +1,13 @@
+{
+    "name": "reports",
+    "version": "1.0.0",
+    "description": "Reporting module - generate and view business reports and analytics",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth"],
+    "optional_dependencies": ["opportunities", "accounts", "campaigns"],
+    "config": {
+        "module_type": "crm_analytics",
+        "load_order": 30,
+        "auto_load": false
+    }
+}

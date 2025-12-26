@@ -10,6 +10,10 @@ class Auth(BaseModule):
         super().initialize(env)
         self.base_module = env.get_module('base')
 
+    def get_models(self):
+        from .models import User, Session
+        return [User, Session]
+
     def load_routes(self):
         return super().load_routes()
 

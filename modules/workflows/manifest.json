@@ -1,0 +1,13 @@
+{
+    "name": "workflows",
+    "version": "1.0.0",
+    "description": "Workflow automation module - create automated business processes",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth"],
+    "optional_dependencies": ["tasks", "notifications"],
+    "config": {
+        "module_type": "crm_automation",
+        "load_order": 25,
+        "auto_load": false
+    }
+}

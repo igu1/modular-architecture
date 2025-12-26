@@ -1,9 +1,9 @@
-from database import DatabaseModel
+from database import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from datetime import datetime
 
-class User(DatabaseModel):
-    __tablename__ = 'auth_users'
+class User(Base):
+    __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
@@ -13,7 +13,7 @@ class User(DatabaseModel):
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime)
 
-class Session(DatabaseModel):
+class Session(Base):
     __tablename__ = 'auth_sessions'
     
     id = Column(Integer, primary_key=True)

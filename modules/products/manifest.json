@@ -1,0 +1,13 @@
+{
+    "name": "products",
+    "version": "1.0.0",
+    "description": "Product catalog module - manage products and services",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth"],
+    "optional_dependencies": [],
+    "config": {
+        "module_type": "crm_sales",
+        "load_order": 15,
+        "auto_load": false
+    }
+}

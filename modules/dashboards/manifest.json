@@ -1,0 +1,13 @@
+{
+    "name": "dashboards",
+    "version": "1.0.0",
+    "description": "Dashboard module - create customizable dashboards with widgets and KPIs",
+    "author": "CRM Team",
+    "dependencies": ["base", "auth"],
+    "optional_dependencies": ["reports"],
+    "config": {
+        "module_type": "crm_analytics",
+        "load_order": 35,
+        "auto_load": false
+    }
+}
