@@ -23,11 +23,12 @@ def get_session():
 
 # Manassilakkanund
 @contextmanager
-def session_scope():
+def session_scope(commit=True):
     session = get_session()
     try:
         yield session
-        session.commit()
+        if commit:
+            session.commit()
     except:
         session.rollback()
         raise
@@ -48,25 +49,25 @@ class DatabaseModel(Base):
     
     @classmethod
     def get(cls, **kwargs):
-        with session_scope() as session:
+        with session_scope(commit=False) as session:
             instance = session.query(cls).filter_by(**kwargs).first()
             return instance.to_dict() if instance else None
     
     @classmethod
     def filter(cls, **kwargs):
-        with session_scope() as session:
+        with session_scope(commit=False) as session:
             instances = session.query(cls).filter_by(**kwargs).all()
             return [inst.to_dict() for inst in instances]
     
     @classmethod
     def all(cls):
-        with session_scope() as session:
+        with session_scope(commit=False) as session:
             instances = session.query(cls).all()
             return [inst.to_dict() for inst in instances]
     
     @classmethod
     def count(cls):
-        with session_scope() as session:
+        with session_scope(commit=False) as session:
             return session.query(cls).count()
     
     @classmethod
