@@ -28,14 +28,17 @@ def create_customer(environ, start_response, customers_module):
         
         name = body.get('name')
         email = body.get('email')
+        company_id = body.get('company_id')
         
-        if not all([name, email]):
-            return customers_module.response(start_response, {'error': 'Name and email are required'}, '400 Bad Request')
+        if not all([name, email, company_id]):
+            return customers_module.response(start_response, {'error': 'Name, email, and company_id are required'}, '400 Bad Request')
         
         if Customer.get(email=email):
             return customers_module.response(start_response, {'error': 'Customer with this email already exists'}, '400 Bad Request')
         
         customer_data = {
+            'company_id': company_id,
+            'lead_id': body.get('lead_id'),
             'name': name,
             'email': email,
             'phone': body.get('phone'),
@@ -43,7 +46,6 @@ def create_customer(environ, start_response, customers_module):
             'address': body.get('address'),
             'city': body.get('city'),
             'country': body.get('country'),
-            'lead_id': body.get('lead_id'),
             'notes': body.get('notes')
         }
         
@@ -52,6 +54,7 @@ def create_customer(environ, start_response, customers_module):
         
         customers_module.emit_event('customer_created', {
             'customer_id': customer['id'],
+            'company_id': customer['company_id'],
             'name': customer['name'],
             'email': customer['email']
         })

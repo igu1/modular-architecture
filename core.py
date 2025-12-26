@@ -73,8 +73,6 @@ class ModularSystem:
 
 if __name__ == "__main__":
     system = ModularSystem()
-    system.load_module('crm')
-    system.load_module('leads')
     system.load_module('customers')
     system.load_module('newsletter')
     system.load_manifest()

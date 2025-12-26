@@ -4,7 +4,7 @@ class Customers(BaseModule):
     
     def __init__(self):
         super().__init__()
-        self.dependencies = ['base', 'auth']
+        self.dependencies = ['base', 'auth', 'crm', 'leads']
 
     def initialize(self, env):
         super().initialize(env)

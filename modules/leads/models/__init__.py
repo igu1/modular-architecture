@@ -1,5 +1,5 @@
 from database import DatabaseModel, Base
-from sqlalchemy import Column, Integer, String, DateTime, Text, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Text, Enum, ForeignKey
 from datetime import datetime
 import enum
 
@@ -14,6 +14,7 @@ class Lead(DatabaseModel):
     __tablename__ = 'leads'
     
     id = Column(Integer, primary_key=True)
+    company_id = Column(Integer, ForeignKey('crm_companies.id'), nullable=False)
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False)
     phone = Column(String(20))

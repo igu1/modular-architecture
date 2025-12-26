@@ -28,11 +28,13 @@ def create_lead(environ, start_response, leads_module):
         
         name = body.get('name')
         email = body.get('email')
+        company_id = body.get('company_id')
         
-        if not all([name, email]):
-            return leads_module.response(start_response, {'error': 'Name and email are required'}, '400 Bad Request')
+        if not all([name, email, company_id]):
+            return leads_module.response(start_response, {'error': 'Name, email, and company_id are required'}, '400 Bad Request')
         
         lead_data = {
+            'company_id': company_id,
             'name': name,
             'email': email,
             'phone': body.get('phone'),
@@ -47,6 +49,7 @@ def create_lead(environ, start_response, leads_module):
         
         leads_module.emit_event('lead_created', {
             'lead_id': lead['id'],
+            'company_id': lead['company_id'],
             'name': lead['name'],
             'email': lead['email']
         })

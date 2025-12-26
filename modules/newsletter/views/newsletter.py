@@ -23,10 +23,12 @@ def subscribe(environ, start_response, newsletter_module):
             return newsletter_module.response(start_response, {'error': 'Invalid request'}, '400 Bad Request')
         
         email = body.get('email')
-        if not email:
-            return newsletter_module.response(start_response, {'error': 'Email is required'}, '400 Bad Request')
+        company_id = body.get('company_id')
         
-        existing = Subscriber.get(email=email)
+        if not all([email, company_id]):
+            return newsletter_module.response(start_response, {'error': 'Email and company_id are required'}, '400 Bad Request')
+        
+        existing = Subscriber.get(email=email, company_id=company_id)
         if existing:
             if existing['is_active']:
                 return newsletter_module.response(start_response, {'error': 'Email already subscribed'}, '400 Bad Request')
@@ -34,6 +36,7 @@ def subscribe(environ, start_response, newsletter_module):
                 subscriber = Subscriber.update_record(existing['id'], is_active=True, unsubscribed_at=None)
         else:
             subscriber_data = {
+                'company_id': company_id,
                 'email': email,
                 'name': body.get('name'),
                 'customer_id': body.get('customer_id')
@@ -44,6 +47,7 @@ def subscribe(environ, start_response, newsletter_module):
         
         newsletter_module.emit_event('newsletter_subscribed', {
             'subscriber_id': subscriber['id'],
+            'company_id': subscriber['company_id'],
             'email': subscriber['email']
         })
         
@@ -107,11 +111,13 @@ def create_campaign(environ, start_response, newsletter_module):
         name = body.get('name')
         subject = body.get('subject')
         content = body.get('content')
+        company_id = body.get('company_id')
         
-        if not all([name, subject, content]):
-            return newsletter_module.response(start_response, {'error': 'Name, subject, and content are required'}, '400 Bad Request')
+        if not all([name, subject, content, company_id]):
+            return newsletter_module.response(start_response, {'error': 'Name, subject, content, and company_id are required'}, '400 Bad Request')
         
         campaign_data = {
+            'company_id': company_id,
             'name': name,
             'subject': subject,
             'content': content,
@@ -123,6 +129,7 @@ def create_campaign(environ, start_response, newsletter_module):
         
         newsletter_module.emit_event('campaign_created', {
             'campaign_id': campaign['id'],
+            'company_id': campaign['company_id'],
             'name': campaign['name']
         })
         
