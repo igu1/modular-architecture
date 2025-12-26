@@ -7,6 +7,7 @@ class Registry:
         self.available_modules = {}
         
         self._subscribers = {} 
+        self._extension_hooks = {}
         
         from logger import core_logger
         self.logger = core_logger
@@ -54,6 +55,8 @@ class Registry:
             module_instance = module_class()
             module_instance.initialize(env)
             self.register_module(module_name, module_instance)
+            
+            self._trigger_hook('module_loaded', module_name, module_instance, env)
             
             return True
             
@@ -167,3 +170,18 @@ class Registry:
         for event_name, subscribers in self._subscribers.items():
             subscriptions[event_name] = [module_name for module_name, _ in subscribers]
         return subscriptions
+    
+    def register_hook(self, hook_name, callback):
+        """Register a hook callback for runtime extensions"""
+        if hook_name not in self._extension_hooks:
+            self._extension_hooks[hook_name] = []
+        self._extension_hooks[hook_name].append(callback)
+    
+    def _trigger_hook(self, hook_name, *args, **kwargs):
+        """Trigger all callbacks registered for a hook"""
+        if hook_name in self._extension_hooks:
+            for callback in self._extension_hooks[hook_name]:
+                try:
+                    callback(*args, **kwargs)
+                except Exception as e:
+                    self.logger.log("registry", f"Error in hook '{hook_name}': {e}", "error")

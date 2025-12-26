@@ -2,6 +2,7 @@ from modules.leads.models import Lead, LeadStatus
 
 def list_leads(environ, start_response, leads_module):
     try:
+        # crm_module = leads_module.env.get_module('crm')
         leads_module.log("Listing all leads", "info")
         leads = Lead.all()
         return leads_module.response(start_response, {'leads': leads})

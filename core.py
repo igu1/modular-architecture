@@ -10,6 +10,8 @@ class ModularSystem:
         self.logger = CoreLogger()
         import modules
         self.registry.set_available_modules(modules.modules)
+        
+        self._setup_extensions()
 
 
     def load_module(self, module_name):
@@ -70,6 +72,26 @@ class ModularSystem:
     def _404_response(self, start_response):
         start_response('404 Not Found', [('Content-type', 'text/plain')])
         return [b"Page not found"]
+    
+    def _setup_extensions(self):
+        import os
+        patches_dir = os.path.join(os.path.dirname(__file__), 'patches')
+        if os.path.exists(patches_dir):
+            try:
+                from patches import PatchEngine
+                patch_engine = PatchEngine()
+                patch_engine.set_logger(self.logger)
+                patch_engine.load_patches_from_directory(patches_dir)
+                
+                def apply_patches_hook(module_name, module_instance, env):
+                    applied = patch_engine.apply_patches_to_module(module_name, module_instance, env)
+                    if applied > 0:
+                        self.logger.log("core", f"Applied {applied} patches to module '{module_name}'", "info")
+                
+                self.registry.register_hook('module_loaded', apply_patches_hook)
+                self.logger.log("core", f"Patch system initialized with {len(patch_engine.patches)} patches", "info")
+            except ImportError:
+                pass
 
 if __name__ == "__main__":
     system = ModularSystem()
@@ -77,7 +99,6 @@ if __name__ == "__main__":
     system.load_module('crm')
     system.load_module('leads')
     system.load_manifest()
-
     from wsgiref.simple_server import make_server
 
     try:
