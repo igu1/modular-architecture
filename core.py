@@ -73,45 +73,7 @@ class ModularSystem:
 
 if __name__ == "__main__":
     system = ModularSystem()
-    
-    # Load foundation modules first
-    system.load_module('base')
-    system.load_module('crm')  # Provides crm_companies table
-    
-    # Load core CRM modules (foundation)
-    system.load_module('accounts')  # No dependencies on other CRM modules
-    system.load_module('leads')     # No dependencies on other CRM modules
-    system.load_module('contacts')  # Depends on accounts
-    system.load_module('customers') # Existing module
-    system.load_module('opportunities')  # Depends on accounts, contacts, campaigns
-    
-    # Load marketing modules (needed by sales)
-    system.load_module('campaigns')  # Depends on contacts, leads
-    system.load_module('email_marketing')  # Depends on campaigns, contacts
-    
-    # Load sales modules (in dependency order)
-    system.load_module('products')  # No dependencies on other CRM modules
-    system.load_module('quotes')    # Depends on opportunities, accounts, contacts, products
-    system.load_module('orders')    # Depends on quotes, opportunities, accounts, contacts, products
-    system.load_module('invoices')  # Depends on orders, accounts, contacts, products
-    
-    # Load support modules
-    system.load_module('tickets')        # Depends on accounts, contacts, products
-    system.load_module('knowledge_base') # No CRM dependencies
-    
-    # Load automation modules
-    system.load_module('tasks')         # Depends on accounts, contacts, opportunities
-    system.load_module('workflows')     # No CRM dependencies
-    system.load_module('notifications') # No CRM dependencies
-    
-    # Load communication modules
-    system.load_module('activities')    # Depends on accounts, contacts, opportunities
-    system.load_module('newsletter')    # Existing module
-    
-    # Load analytics modules
-    system.load_module('reports')       # No CRM dependencies
-    system.load_module('dashboards')    # No CRM dependencies
-    
+    system.load_module('leads')
     system.load_manifest()
 
     from wsgiref.simple_server import make_server
