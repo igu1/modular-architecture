@@ -3,11 +3,6 @@ from datetime import datetime
 
 def list_subscribers(environ, start_response, newsletter_module):
     try:
-        auth_service = newsletter_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, newsletter_module)
-        if not user:
-            return newsletter_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         newsletter_module.log("Listing all subscribers", "info")
         subscribers = Subscriber.all()
         return newsletter_module.response(start_response, {'subscribers': subscribers})
@@ -84,11 +79,6 @@ def unsubscribe(environ, start_response, newsletter_module):
 
 def list_campaigns(environ, start_response, newsletter_module):
     try:
-        auth_service = newsletter_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, newsletter_module)
-        if not user:
-            return newsletter_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         newsletter_module.log("Listing all campaigns", "info")
         campaigns = Campaign.all()
         return newsletter_module.response(start_response, {'campaigns': campaigns})
@@ -99,11 +89,6 @@ def list_campaigns(environ, start_response, newsletter_module):
 
 def create_campaign(environ, start_response, newsletter_module):
     try:
-        auth_service = newsletter_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, newsletter_module)
-        if not user:
-            return newsletter_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         body = newsletter_module.get_body(environ)
         if not body:
             return newsletter_module.response(start_response, {'error': 'Invalid request'}, '400 Bad Request')
@@ -121,7 +106,7 @@ def create_campaign(environ, start_response, newsletter_module):
             'name': name,
             'subject': subject,
             'content': content,
-            'created_by': user['id']
+            'created_by': 1
         }
         
         campaign = Campaign.create(**campaign_data)
@@ -141,11 +126,6 @@ def create_campaign(environ, start_response, newsletter_module):
 
 def get_campaign(environ, start_response, newsletter_module):
     try:
-        auth_service = newsletter_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, newsletter_module)
-        if not user:
-            return newsletter_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         campaign_id = route_params.get('id')
         
@@ -164,11 +144,6 @@ def get_campaign(environ, start_response, newsletter_module):
 
 def send_campaign(environ, start_response, newsletter_module):
     try:
-        auth_service = newsletter_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, newsletter_module)
-        if not user:
-            return newsletter_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         campaign_id = route_params.get('id')
         

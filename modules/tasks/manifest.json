@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Task management module - create and track tasks and to-dos",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "accounts", "contacts", "opportunities"],
+    "dependencies": ["base", "accounts", "contacts", "opportunities"],
     "optional_dependencies": [],
     "config": {
         "module_type": "crm_automation",

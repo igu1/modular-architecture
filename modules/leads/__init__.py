@@ -4,7 +4,7 @@ class Leads(BaseModule):
     
     def __init__(self):
         super().__init__()
-        self.dependencies = ['base', 'auth', 'crm']
+        self.dependencies = ['base', 'crm']
 
     def initialize(self, env):
         super().initialize(env)

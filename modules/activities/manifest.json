@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Activity tracking module - log calls, meetings, and other interactions",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "accounts", "contacts", "opportunities"],
+    "dependencies": ["base", "accounts", "contacts", "opportunities"],
     "optional_dependencies": [],
     "config": {
         "module_type": "crm_communication",

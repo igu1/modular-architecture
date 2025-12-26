@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Opportunity management module - track sales opportunities and pipeline",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "accounts", "contacts", "campaigns"],
+    "dependencies": ["base", "accounts", "contacts", "campaigns"],
     "optional_dependencies": ["leads"],
     "config": {
         "module_type": "crm_sales",

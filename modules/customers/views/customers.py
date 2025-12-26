@@ -2,11 +2,6 @@ from modules.customers.models import Customer
 
 def list_customers(environ, start_response, customers_module):
     try:
-        auth_service = customers_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, customers_module)
-        if not user:
-            return customers_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         customers_module.log("Listing all customers", "info")
         customers = Customer.all()
         return customers_module.response(start_response, {'customers': customers})
@@ -17,11 +12,6 @@ def list_customers(environ, start_response, customers_module):
 
 def create_customer(environ, start_response, customers_module):
     try:
-        auth_service = customers_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, customers_module)
-        if not user:
-            return customers_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         body = customers_module.get_body(environ)
         if not body:
             return customers_module.response(start_response, {'error': 'Invalid request'}, '400 Bad Request')
@@ -67,11 +57,6 @@ def create_customer(environ, start_response, customers_module):
 
 def get_customer(environ, start_response, customers_module):
     try:
-        auth_service = customers_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, customers_module)
-        if not user:
-            return customers_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         customer_id = route_params.get('id')
         
@@ -90,11 +75,6 @@ def get_customer(environ, start_response, customers_module):
 
 def update_customer(environ, start_response, customers_module):
     try:
-        auth_service = customers_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, customers_module)
-        if not user:
-            return customers_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         customer_id = route_params.get('id')
         
@@ -129,11 +109,6 @@ def update_customer(environ, start_response, customers_module):
 
 def delete_customer(environ, start_response, customers_module):
     try:
-        auth_service = customers_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, customers_module)
-        if not user:
-            return customers_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         customer_id = route_params.get('id')
         

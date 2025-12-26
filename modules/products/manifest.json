@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Product catalog module - manage products and services",
     "author": "CRM Team",
-    "dependencies": ["base", "auth"],
+    "dependencies": ["base"],
     "optional_dependencies": [],
     "config": {
         "module_type": "crm_sales",

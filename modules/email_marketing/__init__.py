@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class EmailMarketing(BaseModule):
-    dependencies = ['base', 'auth', 'campaigns', 'contacts']
+    dependencies = ['base', 'campaigns', 'contacts']
     
     def __init__(self):
         super().__init__()

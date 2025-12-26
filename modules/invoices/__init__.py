@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Invoices(BaseModule):
-    dependencies = ['base', 'auth', 'orders', 'accounts', 'contacts', 'products']
+    dependencies = ['base', 'orders', 'accounts', 'contacts', 'products']
     
     def __init__(self):
         super().__init__()

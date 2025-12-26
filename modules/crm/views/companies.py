@@ -2,11 +2,6 @@ from modules.crm.models import Company
 
 def list_companies(environ, start_response, crm_module):
     try:
-        auth_service = crm_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, crm_module)
-        if not user:
-            return crm_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         crm_module.log("Listing all companies", "info")
         companies = Company.all()
         return crm_module.response(start_response, {'companies': companies})
@@ -17,11 +12,6 @@ def list_companies(environ, start_response, crm_module):
 
 def create_company(environ, start_response, crm_module):
     try:
-        auth_service = crm_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, crm_module)
-        if not user:
-            return crm_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         body = crm_module.get_body(environ)
         if not body:
             return crm_module.response(start_response, {'error': 'Invalid request'}, '400 Bad Request')
@@ -59,11 +49,6 @@ def create_company(environ, start_response, crm_module):
 
 def get_company(environ, start_response, crm_module):
     try:
-        auth_service = crm_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, crm_module)
-        if not user:
-            return crm_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         company_id = route_params.get('id')
         
@@ -82,11 +67,6 @@ def get_company(environ, start_response, crm_module):
 
 def update_company(environ, start_response, crm_module):
     try:
-        auth_service = crm_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, crm_module)
-        if not user:
-            return crm_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         company_id = route_params.get('id')
         
@@ -121,11 +101,6 @@ def update_company(environ, start_response, crm_module):
 
 def delete_company(environ, start_response, crm_module):
     try:
-        auth_service = crm_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, crm_module)
-        if not user:
-            return crm_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         company_id = route_params.get('id')
         

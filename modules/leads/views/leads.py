@@ -2,11 +2,6 @@ from modules.leads.models import Lead, LeadStatus
 
 def list_leads(environ, start_response, leads_module):
     try:
-        auth_service = leads_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, leads_module)
-        if not user:
-            return leads_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         leads_module.log("Listing all leads", "info")
         leads = Lead.all()
         return leads_module.response(start_response, {'leads': leads})
@@ -17,11 +12,6 @@ def list_leads(environ, start_response, leads_module):
 
 def create_lead(environ, start_response, leads_module):
     try:
-        auth_service = leads_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, leads_module)
-        if not user:
-            return leads_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         body = leads_module.get_body(environ)
         if not body:
             return leads_module.response(start_response, {'error': 'Invalid request'}, '400 Bad Request')
@@ -41,7 +31,7 @@ def create_lead(environ, start_response, leads_module):
             'company': body.get('company'),
             'source': body.get('source'),
             'notes': body.get('notes'),
-            'assigned_to': user['id']
+            'assigned_to': 1
         }
         
         lead = Lead.create(**lead_data)
@@ -62,11 +52,6 @@ def create_lead(environ, start_response, leads_module):
 
 def get_lead(environ, start_response, leads_module):
     try:
-        auth_service = leads_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, leads_module)
-        if not user:
-            return leads_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         lead_id = route_params.get('id')
         
@@ -85,11 +70,6 @@ def get_lead(environ, start_response, leads_module):
 
 def update_lead(environ, start_response, leads_module):
     try:
-        auth_service = leads_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, leads_module)
-        if not user:
-            return leads_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         lead_id = route_params.get('id')
         
@@ -127,11 +107,6 @@ def update_lead(environ, start_response, leads_module):
 
 def delete_lead(environ, start_response, leads_module):
     try:
-        auth_service = leads_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, leads_module)
-        if not user:
-            return leads_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         lead_id = route_params.get('id')
         
@@ -154,11 +129,6 @@ def delete_lead(environ, start_response, leads_module):
 
 def convert_lead(environ, start_response, leads_module):
     try:
-        auth_service = leads_module.env.get_service('auth_auth_service')
-        user = auth_service.require_auth(environ, start_response, leads_module)
-        if not user:
-            return leads_module.response(start_response, {'error': 'Authentication required'}, '401 Unauthorized')
-        
         route_params = environ.get('ROUTE_PARAMS', {})
         lead_id = route_params.get('id')
         

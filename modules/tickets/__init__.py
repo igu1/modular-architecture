@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Tickets(BaseModule):
-    dependencies = ['base', 'auth', 'accounts', 'contacts', 'products']
+    dependencies = ['base', 'accounts', 'contacts', 'products']
     
     def __init__(self):
         super().__init__()

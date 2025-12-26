@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Opportunities(BaseModule):
-    dependencies = ['base', 'auth', 'accounts', 'contacts', 'campaigns']
+    dependencies = ['base', 'accounts', 'contacts', 'campaigns']
     
     def __init__(self):
         super().__init__()

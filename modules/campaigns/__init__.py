@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Campaigns(BaseModule):
-    dependencies = ['base', 'auth', 'contacts', 'leads']
+    dependencies = ['base', 'contacts', 'leads']
     
     def __init__(self):
         super().__init__()

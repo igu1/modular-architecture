@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Orders(BaseModule):
-    dependencies = ['base', 'auth', 'quotes', 'opportunities', 'accounts', 'contacts', 'products']
+    dependencies = ['base', 'quotes', 'opportunities', 'accounts', 'contacts', 'products']
     
     def __init__(self):
         super().__init__()

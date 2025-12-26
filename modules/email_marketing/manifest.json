@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Email marketing module - create and send email campaigns, track engagement",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "campaigns", "contacts"],
+    "dependencies": ["base", "campaigns", "contacts"],
     "optional_dependencies": [],
     "config": {
         "module_type": "crm_marketing",

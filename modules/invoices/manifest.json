@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Invoice management module - create and manage invoices and payments",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "orders", "accounts", "contacts", "products"],
+    "dependencies": ["base", "orders", "accounts", "contacts", "products"],
     "optional_dependencies": [],
     "config": {
         "module_type": "crm_sales",

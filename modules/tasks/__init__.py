@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Tasks(BaseModule):
-    dependencies = ['base', 'auth', 'accounts', 'contacts', 'opportunities']
+    dependencies = ['base', 'accounts', 'contacts', 'opportunities']
     
     def __init__(self):
         super().__init__()

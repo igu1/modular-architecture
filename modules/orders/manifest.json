@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Order management module - manage sales orders and fulfillment",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "quotes", "opportunities", "accounts", "contacts", "products"],
+    "dependencies": ["base", "quotes", "opportunities", "accounts", "contacts", "products"],
     "optional_dependencies": ["invoices"],
     "config": {
         "module_type": "crm_sales",

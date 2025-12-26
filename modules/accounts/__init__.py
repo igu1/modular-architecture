@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Accounts(BaseModule):
-    dependencies = ['base', 'auth']
+    dependencies = ['base']
     
     def __init__(self):
         super().__init__()

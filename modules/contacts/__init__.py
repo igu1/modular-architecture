@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Contacts(BaseModule):
-    dependencies = ['base', 'auth', 'accounts']
+    dependencies = ['base', 'accounts']
     
     def __init__(self):
         super().__init__()

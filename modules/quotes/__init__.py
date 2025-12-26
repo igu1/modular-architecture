@@ -1,7 +1,7 @@
 from modules.engine import BaseModule
 
 class Quotes(BaseModule):
-    dependencies = ['base', 'auth', 'opportunities', 'accounts', 'contacts', 'products']
+    dependencies = ['base', 'opportunities', 'accounts', 'contacts', 'products']
     
     def __init__(self):
         super().__init__()

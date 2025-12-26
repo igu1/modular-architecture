@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Contact management module - manage individual contacts and their relationships",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "accounts"],
+    "dependencies": ["base", "accounts"],
     "optional_dependencies": ["customers"],
     "config": {
         "module_type": "crm_core",

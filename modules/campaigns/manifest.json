@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Marketing campaign management module - plan, execute, and track marketing campaigns",
     "author": "CRM Team",
-    "dependencies": ["base", "auth", "contacts", "leads"],
+    "dependencies": ["base", "contacts", "leads"],
     "optional_dependencies": ["email_marketing"],
     "config": {
         "module_type": "crm_marketing",

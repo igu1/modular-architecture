@@ -76,7 +76,6 @@ if __name__ == "__main__":
     
     # Load foundation modules first
     system.load_module('base')
-    system.load_module('auth')
     system.load_module('crm')  # Provides crm_companies table
     
     # Load core CRM modules (foundation)
