@@ -1,7 +1,0 @@
-{
-    "name": "leads",
-    "version": "1.0.0",
-    "description": "Leads management module - works standalone or integrates with CRM",
-    "author": "System",
-    "dependencies": ["base", "crm"]
-}
